@@ -11,6 +11,10 @@ void setupDataMemory(        char* base_address,
                              char *datasection,
                              unsigned int numberOfBytes){
     // Finish this function to fill in datasection starting from the offset in the memory you created in lab 8.
+	unsigned int i;
+		for(i = 0; i < numberOfBytes; i++){
+    			base_address[offset + i] = datasection[i];
+}
     return;
 
 }
@@ -36,7 +40,9 @@ unsigned int buildJInstruction(unsigned char opcode,
                                int immediate){
      unsigned int machineCode = 0;
      unsigned int mask = 0;
-
+	machineCode = immediate & 0x03FFFFFF;
+	mask = ((unsigned int)(opcode & 0x000000FF)) << 26;
+	machineCode = machineCode | mask;
 
 
 
@@ -52,9 +58,25 @@ unsigned int buildRInstruction(unsigned char opcode,
                                unsigned char rd,
                                unsigned char shamt,
                                unsigned char function){
-     unsigned int machineCode = 0;
-     unsigned int mask = 0;
+     	unsigned int machineCode = 0;
+     	unsigned int mask = 0;
+	mask = (function & 0x3F);
+	machineCode = machineCode | mask;
 
+	mask = ((unsigned int)(shamt & 0x1F)) << 6;
+	machineCode = machineCode | mask;
+
+	mask = ((unsigned int)(rd & 0x1F)) << 11;
+	machineCode = machineCode | mask;
+
+	mask = ((unsigned int)(rt & 0x1F)) << 16;
+	machineCode = machineCode | mask;
+
+	mask = ((unsigned int)(rs & 0x1F)) << 21;
+	machineCode = machineCode | mask;
+
+	mask = ((unsigned int)(opcode & 0x3F)) << 26;
+	machineCode = machineCode | mask;
 
 
 
@@ -71,9 +93,9 @@ void setupInstructionMemory( char* base_memory_address,
     unsigned int machineCode = 0;
     do {
         // if la instruction.
-        if (strcmp(instructionStorage[i].instruction, "la") == 0 ){ 
-        // Notice: This instruction is already done as an example. 
-        
+        if (strcmp(instructionStorage[i].instruction, "la") == 0 ){
+        // Notice: This instruction is already done as an example.
+
         // First, Answer this: what type of instruction is this? J, R or I instruction?
         // Answer:  I instruction
 
@@ -289,8 +311,8 @@ void loadCodeToMem(char *mem){
     // Just need to compile to following instructions:
     //         la, add, lb, bge, lw, sw, addi, j
     setupInstructionMemory(mem, instructionSection, Instruction_storage);
-	
-	// Memory dump the information on the screen. 
+
+	// Memory dump the information on the screen.
     puts("\n---- Data Section ----\n");
     memory_dump(mem, DATASECTION, 256);
     puts("\n---- Code Section ----\n");
